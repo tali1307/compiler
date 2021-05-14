@@ -1,6 +1,9 @@
 *.jack
-Average
-Complex Arrays
-Pong
-Square
-StringTest
+*.h.gch
+*.pdf
+*.txt
+.vscode
+hello
+symbols
+comp
+SymbolGrader.c

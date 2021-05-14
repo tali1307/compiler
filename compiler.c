@@ -14,7 +14,28 @@ Email: sc19ms2@leeds.ac.uk
 Date Work Commenced: 12 May 2021
 *************************************************************************/
 
+#include <dirent.h>
+#include <stdio.h>
 #include "compiler.h"
+
+char *readDirFiles(char *dir_name)
+{
+	char *files;
+	strcpy(files, " ");
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(".");
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+			strcat(files, " ");
+			strcat(files, dir->d_name);
+		}
+		closedir(d);
+	}
+	return files;
+}
 
 int InitCompiler()
 {
@@ -33,7 +54,7 @@ ParserInfo compile(char *dir_name)
 
 int StopCompiler()
 {
-
+	StopParser();
 	return 1;
 }
 
