@@ -16,26 +16,8 @@ Date Work Commenced: 12 May 2021
 
 #include <dirent.h>
 #include <stdio.h>
+#include <string.h>
 #include "compiler.h"
-
-char *readDirFiles(char *dir_name)
-{
-	char *files;
-	strcpy(files, " ");
-	DIR *d;
-	struct dirent *dir;
-	d = opendir(".");
-	if (d)
-	{
-		while ((dir = readdir(d)) != NULL)
-		{
-			strcat(files, " ");
-			strcat(files, dir->d_name);
-		}
-		closedir(d);
-	}
-	return files;
-}
 
 int InitCompiler()
 {
@@ -44,27 +26,48 @@ int InitCompiler()
 
 ParserInfo compile(char *dir_name)
 {
-	ParserInfo p;
+	ParserInfo pi;
+	pi.er = none;
+	DIR *d;
+	struct dirent *dir;
+	d = opendir(dir_name);
 
-	// write your code below
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
+			{
+				printf("the file name : %s\n", dir->d_name);
+				InitParser(dir->d_name);
+				pi = Parse(); // Parses
+				StopParser();
+				printf("ok whats the fucking error: %d at line %d, the lexeme: %s\n", pi.er, pi.tk.ln, pi.tk.lx);
 
-	p.er = none;
-	return p;
+				if (pi.er == none)
+				{
+					printf("are we even in here?");
+					InitLexer(dir->d_name); // call again for the symbols table
+					pi = CheckSymbols();
+					StopLexer();
+				}
+			}
+		}
+		closedir(d);
+	}
+	return pi;
 }
 
 int StopCompiler()
 {
-	StopParser();
 	return 1;
 }
 
 #ifndef TEST_COMPILER
 int main()
 {
-	InitCompiler();
-	ParserInfo p = compile("Pong");
-	PrintError(p);
-	StopCompiler();
+	ParserInfo pi = compile("Pong");
+	PrintTable();
 	return 1;
 }
 #endif

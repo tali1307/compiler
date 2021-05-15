@@ -6,4 +6,7 @@
 
 // define your own types and function prototypes for the symbol table(s) module below
 
+void PrintTable();
+ParserInfo CheckSymbols();
+
 #endif

@@ -5,5 +5,9 @@
 .vscode
 hello
 symbols
+par
+parser
+compiler
+test
 comp
 SymbolGrader.c

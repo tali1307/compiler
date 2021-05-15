@@ -868,44 +868,44 @@ int StopParser()
 #ifndef TEST_PARSER
 int main()
 {
-	InitParser("closeBracketExpected.jack");
+	InitParser("Main.jack");
 	ParserInfo pi;
 	pi = Parse();
 	StopParser();
-	//printf("\n token lexeme: %s, line no: %d and pi error: ", pi.tk.lx, pi.tk.ln);
+	printf("\n token lexeme: %s at line no: %d and pi error: ", pi.tk.lx, pi.tk.ln);
 	if (pi.er == 0)
-		//printf("none");
-		if (pi.er == 1)
-			//printf("lexerErr");
-			if (pi.er == 2)
-				//printf("classExpected");
-				if (pi.er == 3)
-					//printf("idExpected");
-					if (pi.er == 4)
-						//printf("openBraceExpected");
-						if (pi.er == 5)
-							//printf("closeBraceExpected");
-							if (pi.er == 6)
-								//printf("memberDeclarErr");
-								if (pi.er == 7)
-									//printf("classVarErr");
-									if (pi.er == 8)
-										//printf("illegalType");
-										if (pi.er == 9)
-											//printf("semicolonExpected");
-											if (pi.er == 10)
-												//printf("subroutineDeclarErr");
-												if (pi.er == 11)
-													//printf("openParenExpected");
-													if (pi.er == 12)
-														//printf("closeParenExpected");
-														if (pi.er == 13)
-															//printf("closeBracketExpected");
-															if (pi.er == 14)
-																//printf("equalExpected");
-																if (pi.er == 15)
-																	//printf("syntaxError");
-																	//printf("\n\n\n");
-																	return 1;
+		printf("none");
+	if (pi.er == 1)
+		printf("lexerErr");
+	if (pi.er == 2)
+		printf("classExpected");
+	if (pi.er == 3)
+		printf("idExpected");
+	if (pi.er == 4)
+		printf("openBraceExpected");
+	if (pi.er == 5)
+		printf("closeBraceExpected");
+	if (pi.er == 6)
+		printf("memberDeclarErr");
+	if (pi.er == 7)
+		printf("classVarErr");
+	if (pi.er == 8)
+		printf("illegalType");
+	if (pi.er == 9)
+		printf("semicolonExpected");
+	if (pi.er == 10)
+		printf("subroutineDeclarErr");
+	if (pi.er == 11)
+		printf("openParenExpected");
+	if (pi.er == 12)
+		printf("closeParenExpected");
+	if (pi.er == 13)
+		printf("closeBracketExpected");
+	if (pi.er == 14)
+		printf("equalExpected");
+	if (pi.er == 15)
+		printf("syntaxError");
+	printf("\n\n\n");
+	return 1;
 }
 #endif
