@@ -8,6 +8,8 @@ symbols
 par
 parser
 compiler
+Bat
+lexer
 test
 comp
 SymbolGrader.c

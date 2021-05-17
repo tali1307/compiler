@@ -26,6 +26,8 @@ int InitCompiler()
 
 ParserInfo compile(char *dir_name)
 {
+	initSymbolsTable();
+
 	ParserInfo pi;
 	pi.er = none;
 	DIR *d;
@@ -38,23 +40,47 @@ ParserInfo compile(char *dir_name)
 		{
 			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
 			{
-				printf("the file name : %s\n", dir->d_name);
-				InitParser(dir->d_name);
+				char dirPath[200];
+				snprintf(dirPath, 200, "%s/%s", dir_name, dir->d_name);
+
+				InitParser(dirPath);
 				pi = Parse(); // Parses
 				StopParser();
-				printf("ok whats the fucking error: %d at line %d, the lexeme: %s\n", pi.er, pi.tk.ln, pi.tk.lx);
-
 				if (pi.er == none)
 				{
-					printf("are we even in here?");
-					InitLexer(dir->d_name); // call again for the symbols table
-					pi = CheckSymbols();
-					StopLexer();
+					InitParser(dirPath); // call again for the symbols table
+					pi = AddSymbols();
+					StopParser();
+					if (pi.er == redecIdentifier)
+						return pi;
 				}
 			}
 		}
-		closedir(d);
 	}
+	closedir(d);
+
+	d = opendir(dir_name);
+
+	if (d)
+	{
+		while ((dir = readdir(d)) != NULL)
+		{
+			if (strcmp(dir->d_name, ".") != 0 && strcmp(dir->d_name, "..") != 0)
+			{
+				char dirPath[200];
+				snprintf(dirPath, 200, "%s/%s", dir_name, dir->d_name);
+
+				InitParser(dirPath);
+				pi = CheckUndeclared();
+				StopParser();
+				if (pi.er == undecIdentifier)
+					return pi;
+				return pi;
+			}
+		}
+	}
+	closedir(d);
+
 	return pi;
 }
 
@@ -66,8 +92,13 @@ int StopCompiler()
 #ifndef TEST_COMPILER
 int main()
 {
-	ParserInfo pi = compile("Pong");
+	ParserInfo pi = compile("UNDECLAR_SUB");
+	printf("error: %d %s at line %d in file %s\n", pi.er, pi.tk.lx, pi.tk.ln, pi.tk.fl);
 	PrintTable();
+
+	/* ParserInfo p = compile("UNDECLAR_CLASS");
+	printf("error: %d %s at line %d in file %s\n", p.er, p.tk.lx, p.tk.ln, p.tk.fl);
+	PrintTable(); */
 	return 1;
 }
 #endif
