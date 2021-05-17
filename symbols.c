@@ -317,17 +317,16 @@ ParserInfo CheckUndeclared()
 {
     ParserInfo pi;
     pi.er = none;
-    pi.tk = PeekNextToken();
+    pi.tk = GetNextToken();
     while (pi.tk.tp != EOFile)
     {
-        int flag = 0;
-        pi.tk = GetNextToken();
         if (strcmp(pi.tk.lx, "let") == 0 || strcmp(pi.tk.lx, "do") == 0)
         {
             while (strcmp(pi.tk.lx, ";") != 0)
             {
+                int flag = 0;
                 pi.tk = GetNextToken();
-                if (pi.tk.tp = ID)
+                if (pi.tk.tp == ID)
                 {
                     for (int i = 0; i < symbols_table_index; i++)
                     {
