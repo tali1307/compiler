@@ -43,6 +43,8 @@ table symbols_table[TABLE_SIZE];
 int symbols_table_index = 0;
 char className[MAX_STRING];
 
+char *MathsFunctions[] = {"multiply", "divide", "min", "max", "sqrt"};
+
 void initSymbolsTable()
 {
     symbols_table_index = 0;
@@ -62,7 +64,7 @@ void PrintTable()
 {
     printf("\n\tindex\t\tscope_name\t\tname\t\ttype\t\tkind\t\tscope_level\n");
     printf("----------------------------------------------------------------------------------------------------\n");
-    for (int i = 0; i < 5; i++)
+    for (int i = 0; i < symbols_table_index; i++)
     {
         if (symbols_table[i].scope_level == 0)
             printf("\t%d\t\t-----\n", i);
@@ -307,6 +309,21 @@ ParserInfo AddSymbols()
                     return pi;
             }
         }
+        else if (strcmp(pi.tk.lx, "Math") == 0)
+        {
+            table t;
+            for (int i = 0; i < 5; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, MathsFunctions[i]);
+                strcpy(t.type, "class");
+                strcpy(t.scope_name, "Math");
+                t.scope_level = CLASS_SCOPE;
+                printf("index: %d\n", symbols_table_index);
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
         else
             pi.tk = GetNextToken();
     }
@@ -330,7 +347,7 @@ ParserInfo CheckUndeclared()
                 {
                     for (int i = 0; i < symbols_table_index; i++)
                     {
-                        if (strcmp(pi.tk.lx, symbols_table[i].name) == 0)
+                        if (strcmp(pi.tk.lx, symbols_table[i].name) == 0 || strcmp(pi.tk.lx, symbols_table[i].scope_name) == 0)
                         {
                             flag = -1;
                             break;
@@ -341,6 +358,27 @@ ParserInfo CheckUndeclared()
                         pi.er = undecIdentifier;
                         return pi;
                     }
+                }
+            }
+        }
+        else if (strcmp(pi.tk.lx, "var") == 0 || strcmp(pi.tk.lx, "field") == 0 || strcmp(pi.tk.lx, "static") == 0)
+        {
+            int flag = 0;
+            pi.tk = GetNextToken();
+            if (pi.tk.tp == ID)
+            {
+                for (int i = 0; i < symbols_table_index; i++)
+                {
+                    if (strcmp(pi.tk.lx, symbols_table[i].scope_name) == 0)
+                    {
+                        flag = -1;
+                        break;
+                    }
+                }
+                if (flag == 0)
+                {
+                    pi.er = undecIdentifier;
+                    return pi;
                 }
             }
         }

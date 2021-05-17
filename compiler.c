@@ -92,7 +92,7 @@ int StopCompiler()
 #ifndef TEST_COMPILER
 int main()
 {
-	ParserInfo pi = compile("UNDECLAR_VAR");
+	ParserInfo pi = compile("USES_MATH_LIB");
 	printf("error: %d %s at line %d in file %s\n", pi.er, pi.tk.lx, pi.tk.ln, pi.tk.fl);
 	PrintTable();
 
