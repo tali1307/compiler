@@ -75,7 +75,6 @@ ParserInfo compile(char *dir_name)
 				StopParser();
 				if (pi.er == undecIdentifier)
 					return pi;
-				return pi;
 			}
 		}
 	}
@@ -92,7 +91,7 @@ int StopCompiler()
 #ifndef TEST_COMPILER
 int main()
 {
-	ParserInfo pi = compile("USES_MATH_LIB");
+	ParserInfo pi = compile("REDECLAR_VAR");
 	printf("error: %d %s at line %d in file %s\n", pi.er, pi.tk.lx, pi.tk.ln, pi.tk.fl);
 	PrintTable();
 

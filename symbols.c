@@ -43,7 +43,14 @@ table symbols_table[TABLE_SIZE];
 int symbols_table_index = 0;
 char className[MAX_STRING];
 
-char *MathsFunctions[] = {"multiply", "divide", "min", "max", "sqrt"};
+char *MathsFunctions[] = {"multiply", "divide", "min", "max", "sqrt", "abs"};
+char *StringMethods[] = {"new", "dispose", "length", "charAt", "setCharAt", "appendChar", "eraseLastChar", "intValue", "setInt", "backSpace", "doubleQuote", "newLine"};
+char *ArrayMethods[] = {"new", "dispose"};
+char *OutputFunctions[] = {"moveCursor", "printChar", "printString", "printInt", "println", "backspace"};
+char *ScreenFunctions[] = {"clearScreen", "setColor", "drawPixel", "drawLine", "drawRectangle", "drawCircle"};
+char *KeyboardFunctions[] = {"keyPressed", "readChar", "readLine", "readInt"};
+char *MemoryFunctions[] = {"peek", "poke", "alloc", "deAlloc"};
+char *SysFunctions[] = {"halt", "error", "wait"};
 
 void initSymbolsTable()
 {
@@ -54,7 +61,7 @@ bool isRedeclar(table t)
 {
     for (int i = 0; i < symbols_table_index; i++)
     {
-        if (strcmp(symbols_table[i].name, t.name) == 0 && strcmp(symbols_table[i].scope_name, t.scope_name) == 0)
+        if (strcmp(symbols_table[i].name, t.name) == 0 && strcmp(symbols_table[i].scope_name, t.scope_name) == 0 && strcmp(t.kind, "argument") != 0)
             return true;
     }
     return false;
@@ -269,6 +276,8 @@ ParserInfo funcTable(char *func_or_cons)
             pi = identifierList(pi, scope_name);
         if (strcmp(pi.tk.lx, "constructor") == 0 || strcmp(pi.tk.lx, "function") == 0)
             break;
+        if (pi.er == redecIdentifier || pi.er == undecIdentifier)
+            return pi;
     }
     free(scope_name);
     return pi;
@@ -278,6 +287,7 @@ ParserInfo AddSymbols()
 {
     ParserInfo pi;
     pi.er = none;
+    int mathFlag = 0, sysFlag = 0, keyFlag = 0, stringFlag = 0, outFlag = 0, memoryFlag = 0, arrayFlag = 0, screenFlag = 0;
     pi.tk = GetNextToken();
     while (pi.tk.tp != EOFile)
     {
@@ -292,7 +302,7 @@ ParserInfo AddSymbols()
             pi = methodTable();
             if (pi.er != none)
             {
-                if (pi.er != redecIdentifier || pi.er != undecIdentifier)
+                if (pi.er != redecIdentifier && pi.er != undecIdentifier)
                     pi.er = none;
                 else
                     return pi;
@@ -303,23 +313,128 @@ ParserInfo AddSymbols()
             pi = funcTable(pi.tk.lx);
             if (pi.er != none)
             {
-                if (pi.er != redecIdentifier || pi.er != undecIdentifier)
+                if (pi.er != redecIdentifier && pi.er != undecIdentifier)
                     pi.er = none;
                 else
                     return pi;
             }
         }
-        else if (strcmp(pi.tk.lx, "Math") == 0)
+        else if (strcmp(pi.tk.lx, "Math") == 0 && mathFlag == 0)
         {
             table t;
-            for (int i = 0; i < 5; i++)
+            mathFlag = -1;
+            for (int i = 0; i < 6; i++)
             {
                 strcpy(t.kind, "function");
                 strcpy(t.name, MathsFunctions[i]);
-                strcpy(t.type, "class");
+                strcpy(t.type, "int");
                 strcpy(t.scope_name, "Math");
                 t.scope_level = CLASS_SCOPE;
-                printf("index: %d\n", symbols_table_index);
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Memory") == 0 && memoryFlag == 0)
+        {
+            table t;
+            memoryFlag = -1;
+            for (int i = 0; i < 4; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, MemoryFunctions[i]);
+                strcpy(t.type, "class");
+                strcpy(t.scope_name, "Memory");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "String") == 0 && stringFlag == 0)
+        {
+            table t;
+            stringFlag = -1;
+            for (int i = 0; i < 12; i++)
+            {
+                strcpy(t.kind, "method");
+                strcpy(t.name, StringMethods[i]);
+                strcpy(t.type, "class");
+                strcpy(t.scope_name, "String");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Array") == 0 && arrayFlag == 0)
+        {
+            table t;
+            arrayFlag = -1;
+            for (int i = 0; i < 2; i++)
+            {
+                strcpy(t.kind, "method");
+                strcpy(t.name, ArrayMethods[i]);
+                strcpy(t.type, "class");
+                strcpy(t.scope_name, "Array");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Output") == 0 && outFlag == 0)
+        {
+            table t;
+            outFlag = -1;
+            for (int i = 0; i < 6; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, OutputFunctions[i]);
+                strcpy(t.type, "void");
+                strcpy(t.scope_name, "Output");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Screen") == 0 && screenFlag == 0)
+        {
+            table t;
+            screenFlag = -1;
+            for (int i = 0; i < 6; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, ScreenFunctions[i]);
+                strcpy(t.type, "void");
+                strcpy(t.scope_name, "Screen");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Keyboard") == 0 && keyFlag == 0)
+        {
+            table t;
+            keyFlag = -1;
+            for (int i = 0; i < 4; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, KeyboardFunctions[i]);
+                strcpy(t.type, "class");
+                strcpy(t.scope_name, "Keyboard");
+                t.scope_level = CLASS_SCOPE;
+                symbols_table[symbols_table_index++] = t;
+            }
+            pi.tk = GetNextToken();
+        }
+        else if (strcmp(pi.tk.lx, "Sys") == 0 && sysFlag == 0)
+        {
+            table t;
+            sysFlag = -1;
+            for (int i = 0; i < 3; i++)
+            {
+                strcpy(t.kind, "function");
+                strcpy(t.name, SysFunctions[i]);
+                strcpy(t.type, "void");
+                strcpy(t.scope_name, "Sys");
+                t.scope_level = CLASS_SCOPE;
                 symbols_table[symbols_table_index++] = t;
             }
             pi.tk = GetNextToken();
